@@ -27,7 +27,7 @@
 /*	  All Rights Reserved	*/
 
 /*
- * Copyright 2016 Joyent, Inc.
+ * Copyright 2017 Joyent, Inc.
  */
 
 #ifndef _SYS_PROC_PRDATA_H

@@ -363,6 +363,7 @@ typedef struct {
 	sl_field_t		pr_bindpro;
 	sl_field_t		pr_bindpset;
 	sl_field_t		pr_lgrp;
+	sl_field_t		pr_lwpname;
 } sl_lwpsinfo_layout_t;
 
 /*

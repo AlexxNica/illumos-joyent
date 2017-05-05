@@ -25,7 +25,7 @@
  */
 /*
  * Copyright 2012 DEY Storage Systems, Inc.  All rights reserved.
- * Copyright 2015, Joyent, Inc.
+ * Copyright 2017, Joyent, Inc.
  */
 
 #ifndef _SYS_PROCFS_H
@@ -241,6 +241,7 @@ typedef struct pstatus {
  * lwp ps(1) information file.  /proc/<pid>/lwp/<lwpid>/lwpsinfo
  */
 #define	PRFNSZ		16	/* Maximum size of execed filename */
+#define	PRLWPNSZ	32	/* Maximum size of an lwp name */
 typedef struct lwpsinfo {
 	int	pr_flag;	/* lwp flags (DEPRECATED; do not use) */
 	id_t	pr_lwpid;	/* lwp id */
@@ -268,6 +269,7 @@ typedef struct lwpsinfo {
 	psetid_t pr_bindpset;	/* processor set to which lwp is bound */
 	int	pr_lgrp;	/* lwp home lgroup */
 	int	pr_filler[4];	/* reserved for future use */
+	char	pr_lwpname[PRLWPNSZ];	/* lwp name */
 } lwpsinfo_t;
 
 /*
@@ -685,6 +687,7 @@ typedef struct lwpsinfo32 {
 	psetid_t pr_bindpset;	/* processor set to which lwp is bound */
 	int	pr_lgrp;	/* lwp home lgroup */
 	int	pr_filler[4];	/* reserved for future use */
+	char	pr_lwpname[PRLWPNSZ];	/* lwp name */
 } lwpsinfo32_t;
 
 /*

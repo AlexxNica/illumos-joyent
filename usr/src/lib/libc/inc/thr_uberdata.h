@@ -23,7 +23,7 @@
  * Copyright (c) 1999, 2010, Oracle and/or its affiliates. All rights reserved.
  */
 /*
- * Copyright 2016 Joyent, Inc.
+ * Copyright 2017 Joyent, Inc.
  */
 
 #ifndef _THR_UBERDATA_H
@@ -527,6 +527,8 @@ typedef void (*tmem_func_t)(void *, int);
  * Round up an integral value to a multiple of 64
  */
 #define	roundup64(x)	(-(-(x) & -64))
+
+#define	THR_NAME_MAX	(32)
 
 /*
  * NOTE:  Whatever changes are made to ulwp_t must be
@@ -1234,6 +1236,7 @@ typedef	struct	_thrattr {
 	int	policy;
 	int	inherit;
 	size_t	guardsize;
+	char	name[THR_NAME_MAX];
 } thrattr_t;
 
 typedef	struct	_rwlattr {
@@ -1494,7 +1497,7 @@ extern	int	rw_read_held(rwlock_t *);
 extern	int	rw_write_held(rwlock_t *);
 
 extern	int	_thrp_create(void *, size_t, void *(*)(void *), void *, long,
-			thread_t *, size_t);
+			thread_t *, size_t, const char *);
 extern	int	_thrp_suspend(thread_t, uchar_t);
 extern	int	_thrp_continue(thread_t, uchar_t);
 

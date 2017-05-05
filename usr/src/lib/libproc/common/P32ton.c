@@ -394,6 +394,7 @@ lwpsinfo_32_to_n(const lwpsinfo32_t *src, lwpsinfo_t *dst)
 
 	(void) memcpy(&dst->pr_clname[0], &src->pr_clname[0], PRCLSZ);
 	(void) memcpy(&dst->pr_name[0], &src->pr_name[0], PRFNSZ);
+	(void) memcpy(&dst->pr_lwpname[0], &src->pr_lwpname[0], PRLWPNSZ);
 
 	dst->pr_onpro = src->pr_onpro;
 	dst->pr_bindpro = src->pr_bindpro;

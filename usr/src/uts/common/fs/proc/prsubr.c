@@ -2618,6 +2618,10 @@ prgetlwpsinfo(kthread_t *t, lwpsinfo_t *psp)
 	psp->pr_bindpro = t->t_bind_cpu;
 	psp->pr_bindpset = t->t_bind_pset;
 	psp->pr_lgrp = t->t_lpl->lpl_lgrpid;
+
+	if (t->t_name != NULL)
+		(void) strlcpy(psp->pr_lwpname, t->t_name,
+		    sizeof (psp->pr_lwpname));
 }
 
 #ifdef _SYSCALL32_IMPL
@@ -2687,6 +2691,10 @@ prgetlwpsinfo32(kthread_t *t, lwpsinfo32_t *psp)
 	psp->pr_bindpro = t->t_bind_cpu;
 	psp->pr_bindpset = t->t_bind_pset;
 	psp->pr_lgrp = t->t_lpl->lpl_lgrpid;
+
+	if (t->t_name != NULL)
+		(void) strlcpy(psp->pr_lwpname, t->t_name,
+		    sizeof (psp->pr_lwpname));
 }
 #endif	/* _SYSCALL32_IMPL */
 
@@ -2732,6 +2740,7 @@ lwpsinfo_kto32(const struct lwpsinfo *src, struct lwpsinfo32 *dest)
 	PR_COPY_FIELD(src, dest, pr_bindpro);
 	PR_COPY_FIELD(src, dest, pr_bindpset);
 	PR_COPY_FIELD(src, dest, pr_lgrp);
+	PR_COPY_BUF(src, dest, pr_lwpname);
 }
 
 void

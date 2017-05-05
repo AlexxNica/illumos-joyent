@@ -25,7 +25,7 @@
  * Copyright (c) 2017 by The MathWorks, Inc. All rights reserved.
  */
 /*
- * Copyright 2016 Joyent, Inc.
+ * Copyright 2017 Joyent, Inc.
  */
 
 #include "lint.h"
@@ -562,7 +562,7 @@ find_lwp(thread_t tid)
 
 int
 _thrp_create(void *stk, size_t stksize, void *(*func)(void *), void *arg,
-    long flags, thread_t *new_thread, size_t guardsize)
+    long flags, thread_t *new_thread, size_t guardsize, const char *name)
 {
 	ulwp_t *self = curthread;
 	uberdata_t *udp = self->ul_uberdata;
@@ -717,6 +717,9 @@ _thrp_create(void *stk, size_t stksize, void *(*func)(void *), void *arg,
 
 	exit_critical(self);
 
+	if (name != NULL)
+		(void) pthread_setname_np(tid, name);
+
 	if (!(flags & THR_SUSPENDED))
 		(void) _thrp_continue(tid, TSTP_REGULAR);
 
@@ -727,7 +730,8 @@ int
 thr_create(void *stk, size_t stksize, void *(*func)(void *), void *arg,
     long flags, thread_t *new_thread)
 {
-	return (_thrp_create(stk, stksize, func, arg, flags, new_thread, 0));
+	return (_thrp_create(stk, stksize, func, arg, flags, new_thread, 0,
+	    NULL));
 }
 
 /*
@@ -2405,6 +2409,76 @@ int
 __nthreads(void)
 {
 	return (curthread->ul_uberdata->nthreads);
+}
+
+int
+pthread_setname_np(pthread_t tid, const char *name)
+{
+	extern ssize_t __pwrite(int, const void *, size_t, off_t);
+	char buf[100];
+	char namebuf[THR_NAME_MAX] = { 0 };
+	off_t offset = offsetof(lwpsinfo_t, pr_lwpname);
+	ssize_t n;
+	int fd;
+
+	if (name == NULL)
+		return (EINVAL);
+	if (strlen(name) + 1 > THR_NAME_MAX)
+		return (ERANGE);
+
+	(void) strlcpy(namebuf, name, sizeof (namebuf));
+
+	/* "/proc/self/lwp/%u/lwpsinfo" w/o stdio */
+	(void) strlcpy(buf, "/proc/self/lwp/", sizeof (buf));
+	ultos((uint64_t)tid, 10, buf + strlen(buf));
+	(void) strlcat(buf, "/lwpsinfo", sizeof (buf));
+
+	if ((fd = __open(buf, O_WRONLY, 0)) < 0)
+		return (-1);
+
+	n = __pwrite(fd, namebuf, sizeof (namebuf), offset);
+	(void) __close(fd);
+
+	return ((n > 0) ? 0 : -1);
+}
+
+int
+pthread_getname_np(pthread_t tid, char *name, size_t len)
+{
+	extern ssize_t __pread(int, void *, size_t, off_t);
+	char buf[100];
+	char namebuf[THR_NAME_MAX] = { 0 };
+	off_t offset = offsetof(lwpsinfo_t, pr_lwpname);
+	ssize_t n;
+	int fd;
+
+	if (name == NULL)
+		return (EINVAL);
+
+	/* "/proc/self/lwp/%u/name" w/o stdio */
+	(void) strlcpy(buf, "/proc/self/lwp/", sizeof (buf));
+	ultos((uint64_t)tid, 10, buf + strlen(buf));
+	(void) strlcat(buf, "/lwpsinfo", sizeof (buf));
+
+	if ((fd = __open(buf, O_RDONLY, 0)) < 0) {
+		if (errno == ENOENT)
+			return (ESRCH);
+		return (-1);
+	}
+
+	n = __pread(fd, namebuf, sizeof (namebuf), offset);
+	(void) __close(fd);
+
+	if (n != sizeof (namebuf))
+		return (-1);
+
+	if (namebuf[THR_NAME_MAX - 1] != '\0')
+		namebuf[THR_NAME_MAX - 1] = '\0';
+
+	if (strlcpy(name, namebuf, len) >= len)
+		return (ERANGE);
+
+	return (0);
 }
 
 /*

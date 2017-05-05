@@ -1873,6 +1873,7 @@ static int (*pr_read_function_32[PR_NFILES])() = {
 	pr_read_pidfile,	/* old process file			*/
 	pr_read_pidfile,	/* old lwp file				*/
 	pr_read_opagedata_32,	/* old pagedata file			*/
+	pr_read_name,		/* /proc/<pid>/lwp/<lwpid>/name		*/
 };
 
 static int
@@ -2862,6 +2863,41 @@ pr_write_psinfo(prnode_t *pnp, uio_t *uiop)
 }
 
 
+static int
+pr_write_lwpsinfo(prnode_t *pnp, uio_t *uiop)
+{
+	char	lwpname[PRLWPNSZ];
+	size_t	offset = offsetof(lwpsinfo_t, pr_lwpname);
+	int	error;
+
+#ifdef	_SYSCALL32_IMPL
+	if (curproc->p_model != DATAMODEL_LP64)
+		offset = offsetof(lwpsinfo32_t, pr_lwpname);
+#endif
+
+	/* return if not setting the thread name */
+	if (uiop->uio_offset != offset || uiop->uio_resid != PRLWPNSZ)
+		return (0);
+
+	if ((error = uiomove(lwpname, PRLWPNSZ, UIO_WRITE, uiop)) != 0)
+		return (error);
+
+	lwpname[PRLWPNSZ - 1] = '\0';
+
+	if ((error = prlock(pnp, ZNO)) != 0)
+		return (error);
+
+	/* XXX: should we check & allocate outside of prlock()? */
+	if (pnp->pr_common->prc_thread->t_name == NULL)
+		pnp->pr_common->prc_thread->t_name =
+		    kmem_alloc(PRLWPNSZ, KM_SLEEP);
+
+	bcopy(lwpname, pnp->pr_common->prc_thread->t_name, PRLWPNSZ);
+
+	prunlock(pnp);
+	return (0);
+}
+
 /* ARGSUSED */
 static int
 prwrite(vnode_t *vp, uio_t *uiop, int ioflag, cred_t *cr, caller_context_t *ct)
@@ -2942,6 +2978,9 @@ prwrite(vnode_t *vp, uio_t *uiop, int ioflag, cred_t *cr, caller_context_t *ct)
 
 	case PR_PSINFO:
 		return (pr_write_psinfo(pnp, uiop));
+
+	case PR_LWPSINFO:
+		return (pr_write_lwpsinfo(pnp, uiop));
 
 	default:
 		return ((vp->v_type == VDIR)? EISDIR : EBADF);
@@ -4776,11 +4815,11 @@ prgetnode(vnode_t *dp, prnodetype_t type)
 		break;
 
 	case PR_PSINFO:
+	case PR_LWPSINFO:
 		pnp->pr_mode = 0644;	/* readable by all + owner can write */
 		break;
 
 	case PR_LPSINFO:
-	case PR_LWPSINFO:
 	case PR_USAGE:
 	case PR_LUSAGE:
 	case PR_LWPUSAGE:
@@ -4924,6 +4963,7 @@ static int (*pr_readdir_function[PR_NFILES])() = {
 	pr_readdir_notdir,	/* old process file			*/
 	pr_readdir_notdir,	/* old lwp file				*/
 	pr_readdir_notdir,	/* old pagedata file			*/
+	pr_readdir_notdir,	/* /proc/<pid>/lwp/<lwpid>/name		*/
 };
 
 /* ARGSUSED */
