@@ -305,6 +305,7 @@ MANFILES=	__fbufsize.3c					\
 		pthread_attr_getdetachstate.3c			\
 		pthread_attr_getguardsize.3c			\
 		pthread_attr_getinheritsched.3c			\
+		pthread_attr_getname_np.3c			\
 		pthread_attr_getschedparam.3c			\
 		pthread_attr_getschedpolicy.3c			\
 		pthread_attr_getscope.3c			\
@@ -330,6 +331,7 @@ MANFILES=	__fbufsize.3c					\
 		pthread_equal.3c				\
 		pthread_exit.3c					\
 		pthread_getconcurrency.3c			\
+		pthread_getname_np.3c				\
 		pthread_getschedparam.3c			\
 		pthread_getspecific.3c				\
 		pthread_join.3c					\
@@ -1069,6 +1071,7 @@ MANLINKS=	FD_CLR.3c				\
 		pthread_attr_setdetachstate.3c		\
 		pthread_attr_setguardsize.3c		\
 		pthread_attr_setinheritsched.3c		\
+		pthread_attr_setname_np.3c		\
 		pthread_attr_setschedparam.3c		\
 		pthread_attr_setschedpolicy.3c		\
 		pthread_attr_setscope.3c		\
@@ -1105,6 +1108,7 @@ MANLINKS=	FD_CLR.3c				\
 		pthread_rwlockattr_destroy.3c		\
 		pthread_rwlockattr_setpshared.3c	\
 		pthread_setconcurrency.3c		\
+		pthread_setname_np.3c			\
 		pthread_setschedparam.3c		\
 		pthread_setspecific.3c			\
 		pthread_spin_init.3c			\
@@ -2096,6 +2100,8 @@ pthread_attr_setguardsize.3c		:= LINKSRC = pthread_attr_getguardsize.3c
 
 pthread_attr_setinheritsched.3c		:= LINKSRC = pthread_attr_getinheritsched.3c
 
+pthread_attr_setname_np.3c		:= LINKSRC = pthread_attr_getname_np.3c
+
 pthread_attr_setschedparam.3c		:= LINKSRC = pthread_attr_getschedparam.3c
 
 pthread_attr_setschedpolicy.3c		:= LINKSRC = pthread_attr_getschedpolicy.3c
@@ -2129,6 +2135,8 @@ pthread_condattr_setpshared.3c		:= LINKSRC = pthread_condattr_getpshared.3c
 pthread_condattr_destroy.3c		:= LINKSRC = pthread_condattr_init.3c
 
 pthread_setconcurrency.3c		:= LINKSRC = pthread_getconcurrency.3c
+
+pthread_setname_np.3c			:= LINKSRC = pthread_getname_np.3c
 
 pthread_setschedparam.3c		:= LINKSRC = pthread_getschedparam.3c
 

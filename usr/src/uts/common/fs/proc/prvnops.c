@@ -1873,7 +1873,6 @@ static int (*pr_read_function_32[PR_NFILES])() = {
 	pr_read_pidfile,	/* old process file			*/
 	pr_read_pidfile,	/* old lwp file				*/
 	pr_read_opagedata_32,	/* old pagedata file			*/
-	pr_read_name,		/* /proc/<pid>/lwp/<lwpid>/name		*/
 };
 
 static int
@@ -4958,7 +4957,6 @@ static int (*pr_readdir_function[PR_NFILES])() = {
 	pr_readdir_notdir,	/* old process file			*/
 	pr_readdir_notdir,	/* old lwp file				*/
 	pr_readdir_notdir,	/* old pagedata file			*/
-	pr_readdir_notdir,	/* /proc/<pid>/lwp/<lwpid>/name		*/
 };
 
 /* ARGSUSED */
