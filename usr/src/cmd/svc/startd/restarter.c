@@ -994,6 +994,8 @@ restarter_post_fsminimal_thread(void *unused)
 	scf_handle_t *h;
 	int r;
 
+	(void) pthread_setname_np(pthread_self(), "restarter_post_fsmin");
+
 	h = libscf_handle_create_bound_loop();
 
 	for (;;) {
@@ -1771,6 +1773,8 @@ restarter_process_events(void *arg)
 	char *fmri = (char *)arg;
 	struct timespec to;
 
+	(void) pthread_setname_np(pthread_self(), "restarter_process_events");
+
 	assert(fmri != NULL);
 
 	h = libscf_handle_create_bound_loop();
@@ -1985,6 +1989,8 @@ restarter_event_thread(void *unused)
 {
 	scf_handle_t *h;
 
+	(void) pthread_setname_np(pthread_self(), "restarter_event");
+
 	/*
 	 * This is a new thread, and thus, gets its own handle
 	 * to the repository.
@@ -2195,6 +2201,8 @@ restarter_contracts_event_thread(void *unused)
 {
 	int fd, err;
 	scf_handle_t *local_handle;
+
+	(void) pthread_setname_np(pthread_self(), "restarter_contracts_event");
 
 	/*
 	 * Await graph load completion.  That is, stop here, until we've scanned
@@ -2544,6 +2552,8 @@ restarter_timeouts_event_thread(void *unused)
 	 * the necessary processing every second, as long as the queue
 	 * is not empty.
 	 */
+
+	(void) pthread_setname_np(pthread_self(), "restarter_timeouts_event");
 
 	/*CONSTCOND*/
 	while (1) {

@@ -1135,6 +1135,8 @@ method_thread(void *arg)
 	boolean_t retryable;
 	restarter_str_t reason;
 
+	(void) pthread_setname_np(pthread_self(), "method");
+
 	assert(0 <= info->sf_method_type && info->sf_method_type <= 2);
 
 	/* Get (and lock) the restarter_inst_t. */

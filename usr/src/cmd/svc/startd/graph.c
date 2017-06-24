@@ -3852,6 +3852,8 @@ run_sulogin(const char *msg)
 static void *
 sulogin_thread(void *unused)
 {
+	(void) pthread_setname_np(pthread_self(), "sulogin");
+
 	MUTEX_LOCK(&dgraph_lock);
 
 	assert(sulogin_thread_running);
@@ -3878,6 +3880,8 @@ single_user_thread(void *unused)
 	const char *msg;
 	char *buf;
 	int r;
+
+	(void) pthread_setname_np(pthread_self(), "single_user");
 
 	MUTEX_LOCK(&single_user_thread_lock);
 	single_user_thread_count++;
@@ -5796,6 +5800,8 @@ graph_event_thread(void *unused)
 	scf_handle_t *h;
 	int err;
 
+	(void) pthread_setname_np(pthread_self(), "graph_event");
+
 	h = libscf_handle_create_bound_loop();
 
 	/*CONSTCOND*/
@@ -6154,6 +6160,8 @@ graph_thread(void *arg)
 {
 	scf_handle_t *h;
 	int err;
+
+	(void) pthread_setname_np(pthread_self(), "graph");
 
 	h = libscf_handle_create_bound_loop();
 
@@ -6811,6 +6819,8 @@ repository_event_thread(void *unused)
 	char *pg_name = startd_alloc(max_scf_value_size);
 	int r;
 	int fd;
+
+	(void) pthread_setname_np(pthread_self(), "repository_event");
 
 	h = libscf_handle_create_bound_loop();
 
