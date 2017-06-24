@@ -467,6 +467,7 @@ ipmgmt_db_walk(db_wfunc_t *db_walk_func, void *db_warg, ipadm_db_op_t db_op)
 		(void) pthread_attr_init(&attr);
 		(void) pthread_attr_setdetachstate(&attr,
 		    PTHREAD_CREATE_DETACHED);
+		(void) pthread_attr_setname_np(&attr, "db_restore");
 		err = pthread_create(&tid, &attr, ipmgmt_db_restore_thread,
 		    NULL);
 		(void) pthread_attr_destroy(&attr);
