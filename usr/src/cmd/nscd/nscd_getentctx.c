@@ -21,6 +21,8 @@
 /*
  * Copyright 2009 Sun Microsystems, Inc.  All rights reserved.
  * Use is subject to license terms.
+ *
+ * Copyright 2017 Joyent, Inc.
  */
 
 #include <sys/ccompile.h>
@@ -30,6 +32,7 @@
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <pthread.h>
 
 #include "nscd_db.h"
 #include "nscd_log.h"
@@ -657,6 +660,8 @@ reclaim_getent_ctx(void *arg)
 	nscd_getent_context_t	*first = NULL, *last = NULL;
 	nss_getent_t		nssctx = { 0 };
 	char			*me = "reclaim_getent_ctx";
+
+	(void) pthread_setname_np(pthread_self(), me);
 
 	/*CONSTCOND*/
 	while (1) {

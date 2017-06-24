@@ -48,6 +48,7 @@
 #include <string.h>
 #include <umem.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include "cache.h"
 #include "nscd_door.h"
 #include "nscd_log.h"
@@ -1817,6 +1818,8 @@ init_cache_ctx(int i) {
 static void
 revalidate(nsc_ctx_t *ctx)
 {
+	(void) pthread_setname_np(pthread_self(), "revalidate");
+
 	for (;;) {
 		int 		i, slp, interval, count;
 
@@ -1960,6 +1963,8 @@ launch_update(nsc_lookup_args_t *in)
 static void
 do_update(nsc_lookup_args_t *in) {
 	nss_pheader_t	*phdr = (nss_pheader_t *)in->buffer;
+
+	(void) pthread_setname_np(pthread_self(), "do_update");
 
 	/* update the length of the data buffer */
 	phdr->data_len = phdr->pbufsiz - phdr->data_off;
@@ -2189,6 +2194,8 @@ reaper(nsc_ctx_t *ctx)
 	uint_t		nodes_per_interval, seconds_per_interval;
 	ulong_t		nsc_entries;
 	char		*me = "reaper";
+
+	(void) pthread_setname_np(pthread_self(), "reaper");
 
 	for (;;) {
 		(void) mutex_lock(&ctx->stats_mutex);

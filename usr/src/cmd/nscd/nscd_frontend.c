@@ -89,6 +89,8 @@ server_tsd_bind(void *arg)
 {
 	static void *value = 0;
 
+	(void) pthread_setname_np(pthread_self(), "server_tsd_bind");
+
 	/* disable cancellation to avoid hangs if server threads disappear */
 	(void) pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 	(void) thr_setspecific(server_key, value);
@@ -1476,6 +1478,8 @@ rts_mon(void)
 	} mbuf;
 	struct ifa_msghdr *ifam = &mbuf.ifam;
 	char	*me = "rts_mon";
+
+	(void) pthread_setname_np(pthread_self(), me);
 
 	rt_sock = socket(PF_ROUTE, SOCK_RAW, 0);
 	if (rt_sock < 0) {
