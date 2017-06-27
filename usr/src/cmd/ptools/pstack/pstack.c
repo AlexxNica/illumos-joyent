@@ -137,7 +137,7 @@ static	int	thr_stack(const td_thrhandle_t *, void *);
 static	void	free_threadinfo(void);
 static	struct threadinfo *find_thread(id_t);
 static	int	all_call_stacks(pstack_handle_t *, int);
-static	void	tlhead(id_t, id_t);
+static	void	tlhead(id_t, id_t, const char *);
 static	int	print_frame(void *, prgregset_t, uint_t, const long *);
 static	void	print_zombie(struct ps_prochandle *, struct threadinfo *);
 static	void	print_syscall(const lwpstatus_t *, prgregset_t);
@@ -391,7 +391,7 @@ thread_call_stack(void *data, const lwpstatus_t *psp,
 	if ((tip = find_thread(pip->pr_lwpid)) == NULL)
 		return (0);
 
-	tlhead(tip->threadid, pip->pr_lwpid);
+	tlhead(tip->threadid, pip->pr_lwpid, pip->pr_lwpname);
 	tip->threadid = 0;	/* finish eliminating tid */
 	if (psp)
 		call_stack(h, psp);
@@ -418,7 +418,7 @@ lwp_call_stack(void *data,
 		return (0);
 	h->count++;
 
-	tlhead(0, pip->pr_lwpid);
+	tlhead(0, pip->pr_lwpid, pip->pr_lwpname);
 	if (psp)
 		call_stack(h, psp);
 	else
@@ -462,7 +462,7 @@ all_call_stacks(pstack_handle_t *h, int dothreads)
 			if ((tid = tip->threadid) != 0) {
 				(void) memcpy(lwpstatus.pr_reg, tip->regs,
 				    sizeof (prgregset_t));
-				tlhead(tid, tip->lwpid);
+				tlhead(tid, tip->lwpid, NULL);
 				if (tip->state == TD_THR_ZOMBIE)
 					print_zombie(Pr, tip);
 				else
@@ -475,23 +475,45 @@ all_call_stacks(pstack_handle_t *h, int dothreads)
 	return (0);
 }
 
+/* the width of the header */
+#define	HEAD_WIDTH	(62)
 static void
-tlhead(id_t threadid, id_t lwpid)
+tlhead(id_t threadid, id_t lwpid, const char *name)
 {
+	char buf[128] = { 0 };
+	char num[16];
+	size_t amt = 0;
+	int i;
+
 	if (threadid == 0 && lwpid == 0)
 		return;
 
-	(void) printf("-----------------");
+	if (lwpid > 0) {
+		(void) snprintf(num, sizeof (num), "%d", (int)lwpid);
+		(void) strlcat(buf, "thread# ", sizeof (buf));
+		(void) strlcat(buf, num, sizeof (buf));
+	}
 
-	if (threadid && lwpid)
-		(void) printf("  lwp# %d / thread# %d  ",
-		    (int)lwpid, (int)threadid);
-	else if (threadid)
-		(void) printf("---------  thread# %d  ", (int)threadid);
-	else if (lwpid)
-		(void) printf("  lwp# %d  ------------", (int)lwpid);
+	if (threadid > 0) {
+		(void) snprintf(num, sizeof (num), "%d", (int)threadid);
+		if (lwpid > 0)
+			(void) strlcat(buf, " / ", sizeof (buf));
+		(void) strlcat(buf, "lwp# ", sizeof (buf));
+		(void) strlcat(buf, num, sizeof (buf));
+	}
 
-	(void) printf("--------------------\n");
+	if (name != NULL && strlen(name) > 0) {
+		(void) strlcat(buf, " / ", sizeof (buf));
+		(void) strlcat(buf, name, sizeof (buf));
+	}
+
+	amt = (strlen(buf) - 1) / 2;
+	for (i = 0; i < HEAD_WIDTH - amt; i++)
+		(void) putc('-', stdout);
+	(void) printf(" %s ", buf);
+	for (i = 0; i < HEAD_WIDTH - amt; i++)
+		(void) putc('-', stdout);
+	(void) putc('\n', stdout);
 }
 
 /*ARGSUSED*/
