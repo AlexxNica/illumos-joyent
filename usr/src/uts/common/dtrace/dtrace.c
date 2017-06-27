@@ -3539,6 +3539,20 @@ dtrace_dif_variable(dtrace_mstate_t *mstate, dtrace_state_t *state, uint64_t v,
 
 		return ((uint64_t)lwp->lwp_errno);
 	}
+
+	case DIF_VAR_UTHREADNAME:
+		/*
+		 * See comment in DIF_VAR_PID.
+		 */
+		if (DTRACE_ANCHORED(mstate->dtms_probe) && CPU_ON_INTR(CPU))
+			return (0);
+
+		if (curthread->t_name == NULL)
+			return (0);
+
+		return (dtrace_dif_varstr((uintptr_t)curthread->t_name,
+		    state, mstate));
+
 	default:
 		DTRACE_CPUFLAG_SET(CPU_DTRACE_ILLOP);
 		return (0);
