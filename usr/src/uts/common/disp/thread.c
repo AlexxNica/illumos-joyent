@@ -74,6 +74,7 @@
 #include <sys/waitq.h>
 #include <sys/cpucaps.h>
 #include <sys/kiconv.h>
+#include <sys/atomic.h>
 
 #ifndef	STACK_GROWTH_DOWN
 #error Stacks do not grow downward; 3b2 zombie attack detected!

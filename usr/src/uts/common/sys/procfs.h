@@ -241,6 +241,7 @@ typedef struct pstatus {
  * lwp ps(1) information file.  /proc/<pid>/lwp/<lwpid>/lwpsinfo
  */
 #define	PRFNSZ		16	/* Maximum size of execed filename */
+/* XXX: Would it be better to define this in terms of THREAD_NAME_MAX? */
 #define	PRLWPNSZ	32	/* Maximum size of an lwp name */
 typedef struct lwpsinfo {
 	int	pr_flag;	/* lwp flags (DEPRECATED; do not use) */

@@ -2887,13 +2887,8 @@ pr_write_lwpsinfo(prnode_t *pnp, uio_t *uiop)
 	if ((error = prlock(pnp, ZNO)) != 0)
 		return (error);
 
-	/* XXX: should we check & allocate outside of prlock()? */
-	if (pnp->pr_common->prc_thread->t_name == NULL)
-		pnp->pr_common->prc_thread->t_name =
-		    kmem_alloc(PRLWPNSZ, KM_SLEEP);
-
-	bcopy(lwpname, pnp->pr_common->prc_thread->t_name, PRLWPNSZ);
-
+	/* XXX: This can block, does this cause a problem w/ prlock()? */
+	thread_setname(pnp->pr_common->prc_thread, lwpname);
 	prunlock(pnp);
 	return (0);
 }
