@@ -475,14 +475,14 @@ all_call_stacks(pstack_handle_t *h, int dothreads)
 	return (0);
 }
 
-/* the width of the header */
+/* The width of the header */
 #define	HEAD_WIDTH	(62)
 static void
 tlhead(id_t threadid, id_t lwpid, const char *name)
 {
 	char buf[128] = { 0 };
 	char num[16];
-	size_t amt = 0;
+	ssize_t amt = 0;
 	int i;
 
 	if (threadid == 0 && lwpid == 0)
@@ -507,11 +507,14 @@ tlhead(id_t threadid, id_t lwpid, const char *name)
 		(void) strlcat(buf, name, sizeof (buf));
 	}
 
-	amt = (strlen(buf) - 1) / 2;
-	for (i = 0; i < HEAD_WIDTH - amt; i++)
+	amt = (HEAD_WIDTH - strlen(buf) - 2);
+	if (amt < 4)
+		amt = 4;
+
+	for (i = 0; i < amt / 2; i++)
 		(void) putc('-', stdout);
 	(void) printf(" %s ", buf);
-	for (i = 0; i < HEAD_WIDTH - amt; i++)
+	for (i = 0; i < (amt / 2) + (amt % 2); i++)
 		(void) putc('-', stdout);
 	(void) putc('\n', stdout);
 }
