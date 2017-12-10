@@ -352,3 +352,14 @@ stripfname(char *buf)
 		bytesleft -= length;
 	}
 }
+
+void
+format_lwpname(lwpsinfo_t *lwpi, char *buf, size_t buflen)
+{
+	if (lwpi->pr_lwpname[0] == '\0') {
+		(void) snprintf(buf, buflen, "%d", lwpi->pr_lwpid);
+	} else {
+		(void) strlcpy(buf, lwpi->pr_lwpname,
+		    MIN(buflen, sizeof (lwpi->pr_lwpname)));
+	}
+}

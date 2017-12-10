@@ -389,6 +389,7 @@ list_print(list_t *list)
 	char psize[6], prssize[6], pmem[6], pcpu[6], ptime[12];
 	char pstate[7], pnice[4], ppri[4];
 	char pname[LOGNAME_MAX+1];
+	char lwpname[THR_NAME_MAX]; /* length includes NUL */
 	char projname[PROJNAME_MAX+1];
 	char zonename[ZONENAME_MAX+1];
 	float cpu, mem;

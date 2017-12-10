@@ -37,6 +37,8 @@
 extern "C" {
 #endif
 
+struct lwpsinfo;
+
 extern void Die(char *, ...);
 extern void Warn(char *, ...);
 extern void Progname(char *);
@@ -55,6 +57,7 @@ extern void Priocntl(char *);
 extern void getprojname(projid_t, char *, size_t, int, int, size_t);
 extern void getzonename(projid_t, char *, size_t, int, size_t);
 extern void stripfname(char *);
+extern void format_lwpname(struct lwpsinfo *, char *, size_t);
 
 #ifdef	__cplusplus
 }
